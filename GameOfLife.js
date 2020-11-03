@@ -15,7 +15,7 @@ function makeMatrix(cols, rows) {
 }
 
 function setup() {
-  createCanvas(800, 800);
+  createCanvas(1200, 800);
   cols = width / resolution;
   rows = height / resolution;
 
