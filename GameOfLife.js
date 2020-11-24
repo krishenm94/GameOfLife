@@ -1,6 +1,7 @@
 let cols;
 let rows;
 let matrix;
+let nextMatrix;
 let resolution = 5;
 
 let PAINT_RULE = false;
@@ -15,11 +16,12 @@ function makeMatrix(cols, rows) {
 }
 
 function setup() {
-  createCanvas(1200, 800);
+  createCanvas(800, 800);
   cols = width / resolution;
   rows = height / resolution;
 
   matrix = makeMatrix(cols, rows);
+  nextMatrix = makeMatrix(cols, rows);
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
       matrix[i][j] = floor(random(2));
@@ -39,10 +41,29 @@ function draw() {
         fill(255);
         rect(x, y, resolution - 1, resolution - 1);
       }
+
+      let liveNeighbours = countNeighboursWrapAround(matrix, i, j);
+
+      // 1. Any live cell with fewer than two live neighbours dies by underpopulation
+      // 3. Any live cell with more than three live neighbours dies, as if by overpopulation.
+      if (liveNeighbours < 2 || liveNeighbours > 3) {
+        nextMatrix[i][j] = 0;
+      }
+      // 2. Any live cell with two or three live neighbours lives on to the next generation.
+      // 4. Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+      else if ( liveNeighbours == 3) {
+        nextMatrix[i][j] = 1;
+      }
+      // Otherwise copy old matrix contents
+      else {
+        nextMatrix[i][j]  = matrix[i][j];
+      }
     }
   }
 
-  matrix = next(matrix);
+  let temp = matrix;
+  matrix = nextMatrix;
+  nextMatrix = temp;
 }
 
 function next(matrix) {
